@@ -1,3 +1,5 @@
+const { SULFURAS, MAX_QUALITY, AGED_BRIE, BACKSTAGE_PASSES } = require("./constants");
+
 class Item {
   constructor(name, sellIn, quality) {
     this.name = name;
@@ -12,10 +14,26 @@ const legendaryItem = () => {
   };
 };
 
-const concertItem = (item) => {
+const conjuredItem = (item) => {
   return {
     updateItem: () => {
-      if (item.quality < 50) {
+      item.sellIn -= 1;
+
+      if (item.quality > 0) {
+        item.sellIn > 0 ? (item.quality -= 2) : (item.quality -= 4);
+      }
+
+      if (item.quality < 0) {
+        item.quality = 0;
+      }
+    },
+  };
+};
+
+const backstagePassItem = (item) => {
+  return {
+    updateItem: () => {
+      if (item.quality < MAX_QUALITY) {
         item.quality += 1;
         if (item.sellIn < 11) {
           item.quality += 1;
@@ -37,7 +55,7 @@ const agedBrie = (item) => {
   return {
     updateItem: () => {
       item.sellIn -= 1;
-      if (item.quality < 50) {
+      if (item.quality < MAX_QUALITY) {
         item.quality += 1;
       }
     },
@@ -59,12 +77,14 @@ const standardItem = (item) => {
 };
 
 function createItem(item) {
-  if (item.name === "Sulfuras, Hand of Ragnaros") {
+  if (item.name === SULFURAS) {
     return legendaryItem(item);
-  } else if (item.name === "Aged Brie") {
+  } else if (item.name === AGED_BRIE) {
     return agedBrie(item);
-  } else if (item.name === "Backstage passes to a TAFKAL80ETC concert") {
-    return concertItem(item);
+  } else if (item.name === BACKSTAGE_PASSES) {
+    return backstagePassItem(item);
+  } else if (item.name.toLowerCase().includes("conjured")) {
+    return conjuredItem(item);
   } else {
     return standardItem(item);
   }
@@ -75,9 +95,9 @@ class Shop {
     this.items = items;
   }
   updateQuality() {
-    for (let i = 0; i < this.items.length; i++) {
-      const item = createItem(this.items[i]);
-      item.updateItem();
+    for (const item of this.items) {
+      const inventoryItem = createItem(item);
+      inventoryItem.updateItem();
     }
 
     return this.items;
