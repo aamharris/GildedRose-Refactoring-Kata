@@ -46,6 +46,15 @@ describe("Gilded Rose", function () {
       expect(items[0].quality).toEqual(quality + 3);
     });
 
+    it("does not decrement sellIn or quality for legendary items", () => {
+      const quality = 5;
+      const sellIn = 10;
+      const gildedRose = new Shop([new Item("Sulfuras, Hand of Ragnaros", sellIn, quality)]);
+      const items = gildedRose.updateQuality();
+      expect(items[0].quality).toEqual(quality);
+      expect(items[0].sellIn).toEqual(sellIn);
+    });
+
     it("sets quality for backstage passes to zero when past the sellIn date", () => {
       const quality = 5;
       const gildedRose = new Shop([new Item("Backstage passes to a TAFKAL80ETC concert", 0, quality)]);
