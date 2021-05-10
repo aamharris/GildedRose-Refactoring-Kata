@@ -3,9 +3,10 @@ const conjuredItem = (item) => {
     updateItem: () => {
       item.sellIn -= 1;
 
-      if (item.quality > 0) {
+      // Don't actually need this because your logic safeguards against negative quality
+      // if (item.quality > 0) {
         item.sellIn > 0 ? (item.quality -= 2) : (item.quality -= 4);
-      }
+      // }
 
       if (item.quality < 0) {
         item.quality = 0;
