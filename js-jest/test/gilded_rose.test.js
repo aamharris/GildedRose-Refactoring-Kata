@@ -2,6 +2,14 @@ const { AGED_BRIE, BACKSTAGE_PASSES } = require("../src/constants");
 const { Shop, Item } = require("../src/gilded_rose");
 
 describe("Gilded Rose", function () {
+
+  describe('Shop', () => {
+    it('should have empty list of items by default', () => {
+      const shop = new Shop();
+      expect(shop.items.length).toEqual(0);
+    });
+  });
+
   describe("UpdateQuantity", () => {
     describe("standard items", () => {
       it("lowers the quality and sellIn by one for the item after each day", () => {
@@ -9,7 +17,7 @@ describe("Gilded Rose", function () {
         const sellIn = 5;
         const gildedRose = new Shop([new Item("foo", quality, sellIn)]);
         const items = gildedRose.updateQuality();
-        expect(items[0].sellIn).toBe(quality - 1);
+        expect(items[0].sellIn).toEqual(quality - 1);
         expect(items[0].quality).toEqual(sellIn - 1);
       });
 
@@ -73,6 +81,13 @@ describe("Gilded Rose", function () {
         expect(items[0].quality).toEqual(quality + 3);
       });
 
+      it("does not allow quality to exceed 50", () => {
+        const maxQuality = 50;
+        const gildedRose = new Shop([new Item(BACKSTAGE_PASSES, 5, maxQuality)]);
+        const items = gildedRose.updateQuality();
+        expect(items[0].quality).toEqual(maxQuality);
+      });
+
       it("sets quality for backstage passes to zero when past the sellIn date", () => {
         const quality = 5;
         const gildedRose = new Shop([new Item(BACKSTAGE_PASSES, 0, quality)]);
@@ -115,7 +130,9 @@ describe("Gilded Rose", function () {
       });
 
       it("cannot have a quality lower than zero", () => {
-        const quality = 0;
+        // Setting this to zero in the test doesn't actually check the branch that you might think.
+        // If quality is zero, then neither branch is hit and quality is unaffected
+        const quality = 1;
         const gildedRose = new Shop([new Item("Conjured Mana Cake", 0, quality)]);
         const items = gildedRose.updateQuality();
         expect(items[0].quality).toEqual(0);
